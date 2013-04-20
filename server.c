@@ -4,6 +4,8 @@
 #include <sys/types.h>
 #include <sys/unistd.h>
 #include <netinet/in.h>
+
+#include <string.h>  /* To use the function strlen and memset */
 #define SERVPORT 6666 /*The port that the server listens */
 #define BACKLOG 10 /* The maxium number of connections */
 #define MAXDATASIZE 1000
@@ -32,7 +34,7 @@ int main(int argc,char ** argv)
 		printf("Failed to listen!\n");
 		exit(1);
 	}
-	printf("Listen to port %n!\n", SERVPORT);
+	printf("Listen to port %d!\n", SERVPORT);
 	while(1){
 		int sin_size = sizeof(struct sockaddr_in);
 		if((client_fd = accept(sockfd,(struct sockaddr *)&remote_addr,&sin_size)) == -1) {
