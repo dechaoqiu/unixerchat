@@ -1,3 +1,5 @@
+#include <string.h>  /* To use the function strlen and memset */
+
 #include <sys/socket.h>
 #include <stdlib.h>
 #include <stdio.h>
@@ -5,7 +7,7 @@
 #include <sys/unistd.h>
 #include <netinet/in.h>
 
-#include <string.h>  /* To use the function strlen and memset */
+#include <unistd.h>  /* To use fork() explicitly under Mac OSX */
 #define SERVPORT 6666 /*The port that the server listens */
 #define BACKLOG 10 /* The maxium number of connections */
 #define MAXDATASIZE 1000
@@ -15,7 +17,7 @@ int main(int argc,char ** argv)
 	int sockfd,client_fd; /*sock_fd：The socket that listens to, client_fd：Data transfermation socket */
 	struct sockaddr_in my_addr; /* The local address information */
 	struct sockaddr_in remote_addr; /* The client address information */
-	unsigned char buf[MAXDATASIZE];
+	/*unsigned */char buf[MAXDATASIZE];
 	if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == -1) {
 		printf("Failed to create socket!\n");
 		exit(1);
@@ -37,7 +39,7 @@ int main(int argc,char ** argv)
 	printf("Listen to port %d!\n", SERVPORT);
 	while(1){
 		int sin_size = sizeof(struct sockaddr_in);
-		if((client_fd = accept(sockfd,(struct sockaddr *)&remote_addr,&sin_size)) == -1) {
+		if((client_fd = accept(sockfd,(struct sockaddr *)&remote_addr, (socklen_t *)&sin_size)) == -1) {
 			printf("Failed to accept connections!\n");
 			continue;
 		}
@@ -53,11 +55,11 @@ int main(int argc,char ** argv)
 			int recvbytes;
 			
 			memset(buf,0,BUFFSIZE);
-			if(recvbytes=recv(client_fd,buf,MAXDATASIZE,0)==-1){
+			if((recvbytes=recv(client_fd,buf,MAXDATASIZE,0))==-1){
 				printf("Failed to receive!\n");
 				exit(1);
 			}
-			printf("The client says:%s size: %d\n",buf,strlen(buf));
+			printf("The client says:%s size: %u\n",buf,(unsigned int)strlen(buf));
 			memset(buf,0,BUFFSIZE);
 			close(client_fd);
 			exit(0);
